@@ -10,6 +10,7 @@
 
 
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+git config --global help.autocorrect 5
 
 
 # ===== Below is WIP =====
