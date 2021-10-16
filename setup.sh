@@ -11,6 +11,8 @@
 
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 git config --global help.autocorrect 5
+vim +PluginInstall +qall
+vim +PlugInstall +qall
 
 
 # ===== Below is WIP =====
