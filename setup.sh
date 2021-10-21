@@ -14,6 +14,7 @@ vim +PluginInstall +qall
 vim +PlugInstall +qall
 
 git config --global help.autocorrect 5
+git config --global core.editor "vim"
 
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
