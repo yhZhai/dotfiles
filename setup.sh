@@ -1,90 +1,79 @@
 #!/bin/bash
 
-## DESCRIPTION
-# This script will first backup all existing dotfiles from the home directory,
-# and create symlinks in the home directory for all dotfiles in this repo.
+# DESCRIPTION
+## This script will first backup all existing dotfiles from the home directory,
+## and create symlinks in the home directory for all dotfiles in this repo.
 
-## USAGE
-# ./setup.sh <home directory
+# USAGE
+## Under the dotfiles directory, run:
+## ./setup.sh
 
 
+symlink() {
+  file=$1
+  link=$2
+  if [ ! -e "$link" ]; then  # if the link doesn't exist
+    echo "----- Symlinking the new $link -----"
+    ln -s $file $link
+  fi
+}
 
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+backup() {
+  target=$1
+  if [ -e "$target" ]; then  # if the target file exists
+    if [ ! -L "$target" ]; then  # if the target file is not a symlink
+      echo "----- Moving $target to $target.backup -----"
+      mv "$target" "$target.backup"
+    fi
+  fi
+}
+
+
+# For all files `$name` in the present folder except `*.sh`, `README.md`, and
+# `LICENSE`, backup the target file located at `~/.$name` and symlink `$name` to
+# `~/.$name`.
+for name in *; do  # for all files in the present folder
+  if [ ! -d "$name" ]; then  # not a directory
+    target="$HOME/.$name"
+    if [ ! "$name" =~ '\.sh$' ] && [ "$name" != 'README.md' ] && \
+       [ "$name" != 'LICENSE' ]; then
+      backup $target
+      symlink $PWD/$name $target
+    fi
+  fi
+done
+
+# install oh-my-zsh
+echo "----- Installing oh-my-zsh -----"
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Install zsh-syntax-highlighting plugin
+ZSH_PLUGINS_DIR="$HOME/.oh-my-zsh/custom/plugins"
+mkdir -p "$ZSH_PLUGINS_DIR"
+cd "$ZSH_PLUGINS_DIR"
+if [ ! -d "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" ]; then
+  echo "----- Installing zsh plugin 'zsh-syntax-highlighting' -----"
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting
+fi
+if [ ! -d "$ZSH_PLUGINS_DIR/zsh-autosuggestions" ]; then
+  echo "----- Installing zsh plugin 'zsh-autosuggestions' -----"
+  git clone https://github.com/zsh-users/zsh-autosuggestions
+fi
+if [ ! -d "$ZSH_PLUGINS_DIR/zsh-completions" ]; then
+  echo "----- Installing zsh plugin 'zsh-completions' -----"
+  git clone https://github.com/zsh-users/zsh-completions
+fi
+
+# vim plugins
+## Vundle
+git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+## vim-plug
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PluginInstall +qall
 vim +PlugInstall +qall
 
+# git configs
 git config --global help.autocorrect 5
 git config --global core.editor "vim"
-
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-cd $HOME
-source ~/.zshrc
-
-
-
-# ===== Below is WIP =====
-# symlink() {
-#   file=$1
-#   link=$2
-#   if [ ! -e "$link" ]; then
-#     echo "----- Symlinking the new $link -----"
-#     ln -s $file $link
-#   fi
-# }
-# 
-# 
-# backup() {
-#   target=$1
-#   if [ -e "$target" ]; then
-#     if [ ! -L "$target" ]; then
-#       mv "$target" "$target.backup"
-#       echo "----- Moved the old $target config file to $target.backup -----"
-#     fi
-#   fi
-# }
-# 
-# 
-# # For all files `$name` in the present folder except `*.sh`, `README.md`, 
-# # `settings.json`, and `config`, backup the target file located at `~/.$name` 
-# # and symlink `$name` to `~/.$name`.
-# for name in *; do
-#   if [ ! -d "$name" ]; then
-#     target="$HOME/.$name"
-#     if [[ ! "$name" =~ '\.sh$' ]] && [ "$name" != 'README.md' ] && [[ "$name" != 'settings.json' ]] && [[ "$name" != 'config' ]]; then
-#       backup $target
-#       symlink $PWD/$name $target
-#     fi
-#   fi
-# done
-# 
-# 
-# # Install zsh-syntax-highlighting plugin
-# CURRENT_DIR=`pwd`
-# ZSH_PLUGINS_DIR="$HOME/.oh-my-zsh/custom/plugins"
-# mkdir -p "$ZSH_PLUGINS_DIR" && cd "$ZSH_PLUGINS_DIR"
-# if [ ! -d "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" ]; then
-#   echo "----- Installing zsh plugin 'zsh-syntax-highlighting' -----"
-#   git clone https://github.com/zsh-users/zsh-autosuggestions
-#   git clone https://github.com/zsh-users/zsh-syntax-highlighting
-# fi
-# cd "$CURRENT_DIR"
-# 
-# 
-# # Symlink VS Code settings to the present `settings.json` file
-# # If it's a macOS
-# if [[ `uname` =~ "Darwin" ]]; then
-#   CODE_PATH=~/Library/Application\ Support/Code/User
-# # Else, it's a Linux
-# else
-#   CODE_PATH=~/.config/Code/User
-#   # If this folder doesn't exist, it's a WSL
-#   if [ ! -e $CODE_PATH ]; then
-#     CODE_PATH=~/.vscode-server/data/Machine
-#   fi
-# fi
-# target="$CODE_PATH/settings.json"
-# backup $target
-# symlink $PWD/settings.json $target
-# 

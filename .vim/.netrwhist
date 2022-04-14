@@ -1,7 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =5
-let g:netrw_dirhist_5='/Users/yhzhai/LocalDocuments/Codes/sri-ub-false-image/.git/hooks'
-let g:netrw_dirhist_4='/Users/yhzhai/LocalDocuments/Codes/sri-ub-false-image/.git'
-let g:netrw_dirhist_3='/Users/yhzhai/LocalDocuments/Codes/sri-ub-false-image'
-let g:netrw_dirhist_2='/Users/yhzhai/LocalDocuments/Codes/video_utils/.git'
-let g:netrw_dirhist_1='/Users/yhzhai/LocalDocuments/Codes/ICCV2021-TAL-model/.vscode'
