@@ -107,6 +107,7 @@ source $ZSH/oh-my-zsh.sh
 export TERM=xterm-256color
 
 # use control + arrow to backward/forward one word on macos
-# bindkey -e
-# bindkey '\e\e[C' forward-word
-# bindkey '\e\e[D' backward-word
+bindkey -e
+bindkey '\e\e[C' forward-word
+bindkey '\e\e[D' backward-word
+
