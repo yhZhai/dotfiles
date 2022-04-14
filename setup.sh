@@ -78,7 +78,6 @@ cp molokai.vim $HOME/.vim/colors/
 echo "----- Vim Vundle plugins -----"
 mkdir -p $HOME/.vim/bundle
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-
 ## vim-plug
 echo "----- Vim vim-plug plugins -----"
 mkdir -p $HOME/.vim/autoload
