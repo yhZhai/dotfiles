@@ -70,21 +70,26 @@ source $HOME/.zshrc
 cd $CURRENT_DIR
 
 # vim configs
+## color scheme
+echo "----- Vim color scheme -----"
+mkdir -p $HOME/.vim/colors
+cp molokai.vim $HOME/.vim/colors/
 ## Vundle
+echo "----- Vim Vundle plugins -----"
 mkdir -p $HOME/.vim/bundle
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+
 ## vim-plug
+echo "----- Vim vim-plug plugins -----"
 mkdir -p $HOME/.vim/autoload
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-vim +PluginInstall +qall
-vim +PlugInstall +qall
-## color scheme
-mkdir -p $HOME/.vim/colors
-cp molokai.vim $HOME/.vim/colors/
 ## source
 source $HOME/.vimrc
+vim +PluginInstall +qall
+vim +PlugInstall +qall
 
 # git configs
+echo "----- Git configurations -----"
 git config --global help.autocorrect 5
 git config --global core.editor "vim"
