@@ -65,6 +65,8 @@ if [ ! -d "$ZSH_PLUGINS_DIR/zsh-completions" ]; then
   echo "----- Installing zsh plugin 'zsh-completions' -----"
   git clone https://github.com/zsh-users/zsh-completions
 fi
+## source
+source $HOME/.zshrc
 cd $CURRENT_DIR
 
 # vim configs
