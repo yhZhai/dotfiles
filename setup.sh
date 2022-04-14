@@ -37,7 +37,7 @@ for name in *; do  # for all files in the present folder
   if [ ! -d "$name" ]; then  # not a directory
     target="$HOME/.$name"
     if [ "$name" != 'setup.sh' ] && [ "$name" != 'README.md' ] && \
-       [ "$name" != 'LICENSE' ] && [ "$name" == 'molokai.vim' ]; then
+       [ "$name" != 'LICENSE' ] && [ "$name" != 'molokai.vim' ]; then
       backup $target
       symlink $PWD/$name $target
     fi
@@ -76,6 +76,7 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 vim +PluginInstall +qall
 vim +PlugInstall +qall
 ## color scheme
+mkdir -p $HOME/.vim/colors
 cp molokai.vim $HOME/.vim/colors/
 
 # git configs
