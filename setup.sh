@@ -30,14 +30,14 @@ backup() {
 }
 
 
-# For all files `$name` in the present folder except `*.sh`, `README.md`, and
-# `LICENSE`, backup the target file located at `~/.$name` and symlink `$name` to
-# `~/.$name`.
+# For all files `$name` in the present folder except `setup.sh`, `README.md`,
+# `molokai.vim`, and `LICENSE`, backup the target file located at `~/.$name` and
+# symlink `$name` to `~/.$name`.
 for name in *; do  # for all files in the present folder
   if [ ! -d "$name" ]; then  # not a directory
     target="$HOME/.$name"
-    if [ ! "$name" =~ '\.sh$' ] && [ "$name" != 'README.md' ] && \
-       [ "$name" != 'LICENSE' ]; then
+    if [ "$name" != 'setup.sh' ] && [ "$name" != 'README.md' ] && \
+       [ "$name" != 'LICENSE' ] && [ "$name" == 'molokai.vim' ]; then
       backup $target
       symlink $PWD/$name $target
     fi
@@ -49,6 +49,7 @@ echo "----- Installing oh-my-zsh -----"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Install zsh-syntax-highlighting plugin
+CURRENT_DIR=`pwd`
 ZSH_PLUGINS_DIR="$HOME/.oh-my-zsh/custom/plugins"
 mkdir -p "$ZSH_PLUGINS_DIR"
 cd "$ZSH_PLUGINS_DIR"
@@ -64,8 +65,9 @@ if [ ! -d "$ZSH_PLUGINS_DIR/zsh-completions" ]; then
   echo "----- Installing zsh plugin 'zsh-completions' -----"
   git clone https://github.com/zsh-users/zsh-completions
 fi
+cd $CURRENT_DIR
 
-# vim plugins
+# vim configs
 ## Vundle
 git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 ## vim-plug
@@ -73,6 +75,8 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PluginInstall +qall
 vim +PlugInstall +qall
+## color scheme
+cp molokai.vim $HOME/.vim/colors/
 
 # git configs
 git config --global help.autocorrect 5
