@@ -111,3 +111,6 @@ bindkey -e
 bindkey '\e\e[C' forward-word
 bindkey '\e\e[D' backward-word
 
+# gitignore
+function gi() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
+
