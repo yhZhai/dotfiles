@@ -7,7 +7,7 @@ bash setup.sh
 ```
 **Note after install zsh, you may need to manually `exit` to install zsh plugins.**
 
-[Optional] Manually copy _conda initialization commands_ from *.bashrc* to *.zshrc*.
+[Optional] Install conda after setting up the dotfiles, or manually copy _conda initialization commands_ from *.bashrc* to *.zshrc*.
 
 ### TODO
 
