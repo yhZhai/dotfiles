@@ -37,7 +37,8 @@ for name in *; do  # for all files in the present folder
   if [ ! -d "$name" ]; then  # not a directory
     target="$HOME/.$name"
     if [ "$name" != 'setup.sh' ] && [ "$name" != 'README.md' ] && \
-       [ "$name" != 'LICENSE' ] && [ "$name" != 'molokai.vim' ]; then
+       [ "$name" != 'LICENSE' ] && [ "$name" != 'molokai.vim' ] && \
+       [ "$name" != 'zshrc']; then  # escaping zshrc for now
       backup $target
       symlink $PWD/$name $target
     fi
@@ -47,6 +48,11 @@ done
 # install oh-my-zsh
 echo "----- Installing oh-my-zsh -----"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# replace .zshrc
+echo "----- Backup and symlink .zshrc -----"
+backup .zshrc
+symlink $PWD/zshrc $HOME/.zshrc
 
 # Install zsh-syntax-highlighting plugin
 CURRENT_DIR=`pwd`
