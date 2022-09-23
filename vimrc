@@ -53,11 +53,15 @@ highlight Visual ctermbg=grey                   " highlight selection
 autocmd FileType make setlocal noexpandtab      " do not expand tab for makefile
 autocmd FileType latex setlocal autoindent off
 autocmd FileType latex setlocal smartindent off
+
+" make pair brackets
+inoremap ( ()<LEFT>
+inoremap [ []<LEFT>
+inoremap { {}<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+inoremap < <><LEFT>
 " ----- End of my personal configurations -----
-
-" Start NERDTree and put the cursor back in the other window.
-autocmd VimEnter * NERDTree | wincmd p
-
 
 
 " ----- vim-plug -----
@@ -67,4 +71,8 @@ Plug 'preservim/nerdtree'
 
 let g:deoplete#enable_at_startup = 1
 
+
 call plug#end()
+"
+" Start NERDTree and put the cursor back in the other window.
+autocmd VimEnter * NERDTree | wincmd p
