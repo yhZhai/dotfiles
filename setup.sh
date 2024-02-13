@@ -45,6 +45,9 @@ for name in *; do  # for all files in the present folder
   fi
 done
 
+# install zsh
+sudo apt install zsh
+
 # install oh-my-zsh
 echo "----- Installing oh-my-zsh -----"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
