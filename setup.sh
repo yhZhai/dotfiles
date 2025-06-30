@@ -50,7 +50,7 @@ fi
 
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   log "Installing Oh-My-Zsh (unattended)"
-  doit sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  doit sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
 symlink "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
