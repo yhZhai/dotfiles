@@ -55,7 +55,7 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 # replace .zshrc
 echo "----- Backup and symlink .zshrc -----"
 backup .zshrc
-symlink $PWD/zshrc $HOME/.zshrc
+cp $PWD/zshrc $HOME/.zshrc
 
 # Install zsh-syntax-highlighting plugin
 CURRENT_DIR=`pwd`
