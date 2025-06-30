@@ -1,105 +1,93 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Dot-files bootstrapper — safe, idempotent, and (mostly) cross-platform.
+# Usage:  ./setup.sh [--dry-run]
 
-# DESCRIPTION
-## This script will first backup all existing dotfiles from the home directory,
-## and create symlinks in the home directory for all dotfiles in this repo.
+set -euo pipefail
 
-# USAGE
-## Under the dotfiles directory, run:
-## ./setup.sh
+DRY_RUN=false
+[[ ${1:-} == "--dry-run" ]] && DRY_RUN=true
 
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IGNORE=(setup.sh README.md LICENSE molokai.vim zshrc)
 
-symlink() {
-  file=$1
-  link=$2
-  if [ ! -e "$link" ]; then  # if the link doesn't exist
-    echo "----- Symlinking the new $link -----"
-    ln -s $file $link
-  fi
-}
+# ---------- helpers ----------------------------------------------------------
+log() { printf ">>> %s\n" "$*"; }
+doit() { $DRY_RUN && log "[dry-run] $*" || eval "$*"; }
 
+timestamp() { date +%Y%m%d%H%M%S; }
 
 backup() {
-  target=$1
-  if [ -e "$target" ]; then  # if the target file exists
-    if [ ! -L "$target" ]; then  # if the target file is not a symlink
-      echo "----- Moving $target to $target.backup -----"
-      mv "$target" "$target.backup"
-    fi
-  fi
+  local target="$1"
+  [[ -e "$target" && ! -L "$target" ]] || return 0
+  local bak="${target}.$(timestamp).bak"
+  log "Backup $target  →  $bak"
+  doit mv "$target" "$bak"
 }
 
+symlink() {
+  local src="$1" dst="$2"
+  [[ -L "$dst" && "$(readlink "$dst")" == "$src" ]] && return 0
+  backup "$dst"
+  log "Symlink $dst  →  $src"
+  doit ln -sf "$src" "$dst"
+}
 
-# For all files `$name` in the present folder except `setup.sh`, `README.md`,
-# `molokai.vim`, and `LICENSE`, backup the target file located at `~/.$name` and
-# symlink `$name` to `~/.$name`.
-for name in *; do  # for all files in the present folder
-  if [ ! -d "$name" ]; then  # not a directory
-    target="$HOME/.$name"
-    if [ "$name" != 'setup.sh' ] && [ "$name" != 'README.md' ] && \
-       [ "$name" != 'LICENSE' ] && [ "$name" != 'molokai.vim' ] && \
-       [ "$name" != 'zshrc']; then  # escaping zshrc for now
-      backup $target
-      symlink $PWD/$name $target
-    fi
-  fi
+# ---------- dotfiles ---------------------------------------------------------
+log "Installing dotfiles from $DOTFILES_DIR"
+for file in "$DOTFILES_DIR"/*; do
+  fn="$(basename "$file")"
+  [[ " ${IGNORE[*]} " =~ " $fn " || -d "$file" ]] && continue
+  symlink "$file" "$HOME/.$fn"
 done
 
-# install zsh
-sudo apt install zsh
+# ---------- zsh & Oh-My-Zsh ---------------------------------------------------
+if ! command -v zsh >/dev/null; then
+  log "Installing zsh"
+  if command -v apt >/dev/null;   then doit sudo apt -y install zsh
+  elif command -v brew >/dev/null; then doit brew install zsh
+  else log "⚠️  Package manager not detected; install zsh manually."; fi
+fi
 
-# install oh-my-zsh
-echo "----- Installing oh-my-zsh -----"
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+  log "Installing Oh-My-Zsh (unattended)"
+  doit sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
 
-# replace .zshrc
-echo "----- Backup and symlink .zshrc -----"
-backup .zshrc
-cp $PWD/zshrc $HOME/.zshrc
+symlink "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
 
-# Install zsh-syntax-highlighting plugin
-CURRENT_DIR=`pwd`
+# Plugins
 ZSH_PLUGINS_DIR="$HOME/.oh-my-zsh/custom/plugins"
 mkdir -p "$ZSH_PLUGINS_DIR"
-cd "$ZSH_PLUGINS_DIR"
-if [ ! -d "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" ]; then
-  echo "----- Installing zsh plugin 'zsh-syntax-highlighting' -----"
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting
-fi
-if [ ! -d "$ZSH_PLUGINS_DIR/zsh-autosuggestions" ]; then
-  echo "----- Installing zsh plugin 'zsh-autosuggestions' -----"
-  git clone https://github.com/zsh-users/zsh-autosuggestions
-fi
-if [ ! -d "$ZSH_PLUGINS_DIR/zsh-completions" ]; then
-  echo "----- Installing zsh plugin 'zsh-completions' -----"
-  git clone https://github.com/zsh-users/zsh-completions
-fi
-## source
-source $HOME/.zshrc
-cd $CURRENT_DIR
+declare -a plugins=(
+  zsh-users/zsh-syntax-highlighting
+  zsh-users/zsh-autosuggestions
+  zsh-users/zsh-completions
+)
+for repo in "${plugins[@]}"; do
+  dir="$ZSH_PLUGINS_DIR/$(basename "$repo")"
+  [[ -d "$dir" ]] || doit git clone "https://github.com/$repo" "$dir"
+done
 
-# vim configs
-backup $HOME/.vimrc
-cp $PWD/vimrc $HOME/.vimrc
-## color scheme
-echo "----- Vim color scheme -----"
-mkdir -p $HOME/.vim/colors
-cp molokai.vim $HOME/.vim/colors/
-## Vundle
-echo "----- Vim Vundle plugins -----"
-mkdir -p $HOME/.vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-## vim-plug
-echo "----- Vim vim-plug plugins -----"
-mkdir -p $HOME/.vim/autoload
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-## source
-source $HOME/.vimrc
-vim +PluginInstall +qall
-vim +PlugInstall +qall
+# ---------- Vim --------------------------------------------------------------
+symlink "$DOTFILES_DIR/vimrc" "$HOME/.vimrc"
 
-# git configs
-echo "----- Git configurations -----"
-git config --global help.autocorrect 5
-git config --global core.editor "vim"
+# colour scheme
+mkdir -p "$HOME/.vim/colors"
+symlink "$DOTFILES_DIR/molokai.vim" "$HOME/.vim/colors/molokai.vim"
+
+# vim-plug
+if [[ ! -f "$HOME/.vim/autoload/plug.vim" ]]; then
+  log "Installing vim-plug"
+  doit curl -fsLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+log "Installing Vim plugins (vim-plug)"
+doit vim -E -s +PlugInstall +qall
+
+# ---------- Git --------------------------------------------------------------
+log "Setting Git defaults"
+doit git config --global help.autocorrect 5
+doit git config --global core.editor "vim"
+
+log "✅  All done${DRY_RUN:+ (dry-run)}!"
