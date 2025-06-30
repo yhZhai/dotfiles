@@ -79,6 +79,8 @@ source $HOME/.zshrc
 cd $CURRENT_DIR
 
 # vim configs
+backup $HOME/.vimrc
+cp $PWD/vimrc $HOME/.vimrc
 ## color scheme
 echo "----- Vim color scheme -----"
 mkdir -p $HOME/.vim/colors
